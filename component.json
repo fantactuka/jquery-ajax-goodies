@@ -1,0 +1,10 @@
+{
+  "name": "jquery-ajax-goodies",
+  "version": "0.0.1",
+  "main": "jquery-ajax-goodies.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
+}
