@@ -1,11 +1,29 @@
-(function() {
+/**
+ * jQuery.ajax.goodies
+ *
+ * Adding `cached` and `concurrency` options that allows more flexible requests
+ * management with local caching and concurrents aborting/suppressing
+ *
+ * @author Maksim Horbachevsky
+ */
+
+(function(factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('jquery'));
+  } else {
+    factory(window.jQuery);
+  }
+})(function($) {
   /**
    * Extension storage. Exposed as public property to allow better testability and debugging
    * @type {Object}
    */
   var goodies = $.ajax.goodies = {
     cache: {},
-    concurrents: {}
+    concurrents: {},
+    version: '0.0.1'
   };
 
   /**
@@ -63,7 +81,6 @@
     var key = createKey(options),
       cached = options.cached,
       cachedJqXhr = cached && goodies.cache[key];
-
 
 
     if (cachedJqXhr) {
@@ -135,4 +152,4 @@
       storeConcurrent(key, jqXhr);
     }
   });
-})();
+});
