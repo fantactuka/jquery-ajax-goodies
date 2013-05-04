@@ -31,7 +31,8 @@ $.ajax({ url: '/search', data: {q: 'b'}, concurrency: { key: 'search', type: 'su
 ```
 
 In example above requests would be concurrent event though they have a different set of data, since
-we specified concurrency key.
+we specified concurrency key. By default key is built using url & data, so in we wouldn't specify the key
+these requets would be considered as non-concurrents since they have different data.
 
 ## Cached
 
