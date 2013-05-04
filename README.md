@@ -33,4 +33,21 @@ $.ajax({ url: '/search', data: {q: 'b'}, concurrency: { key: 'search', type: 'su
 In example above requests would be concurrent event though they have a different set of data, since
 we specified concurrency key.
 
+## Cached
 
+Adds `cached` option that allows permanent result caching if value is true.
+
+Example:
+```js
+$.ajax({ url: 'test', cached: true });    // Will run actual request
+$.ajax({ url: 'test', cached: true });    // Returns cached jqXhr, and does not run request
+```
+
+**NOTE**
+Currently it only supports permanent cache during page-lifecycle without
+TTL or local-storage functionality.
+
+It stores succeeded jqXhr object. When we have cached result, we abort
+new request and replace all properties/methods of current jqXhr with cached one. So
+when this merged jqXhr object is returned — it already a resolved deferred object,
+and adding any callbacks like .done, .fail, .always will be triggered immediately.
