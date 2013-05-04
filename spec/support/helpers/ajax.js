@@ -1,7 +1,5 @@
 (function() {
 
-  console.log('ajax added');
-
   /**
    * Slightly modified pivotal's helper (http://github.com/pivotal/jasmine-ajax)
    * to allow more flexible mocking and expectations checking
@@ -52,7 +50,7 @@
       this.responseText = response.responseText || "";
       this.readyState = 4;
       this.responseHeaders = response.responseHeaders ||
-      {"Content-type": response.contentType || "application/json" };
+      {"Content-type": response.contentType || "text/html" };
 
       this.onload();
       this.onreadystatechange();

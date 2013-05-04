@@ -4,7 +4,7 @@
    * @type {Object}
    */
   var goodies = $.ajax.goodies = {
-    cached: {},
+    cache: {},
     concurrents: {}
   };
 
@@ -62,7 +62,7 @@
   $.ajaxPrefilter(function(options, origOptions, jqXhr) {
     var key = createKey(options),
       cached = options.cached,
-      cachedJqXhr = cached && goodies.cached[key];
+      cachedJqXhr = cached && goodies.cache[key];
 
 
 
@@ -76,11 +76,9 @@
       jqXhr.then(options.success, options.error).always(options.complete);
     } else {
       if (cached) {
-        console.log('will cache ' + key);
-        jqXhr.done(function() {
-          console.log('will cache ' + key);
+        jqXhr.success(function() {
           // Storing succeeded jqXhr object
-          goodies.cached[key] = jqXhr;
+          goodies.cache[key] = jqXhr;
         });
       }
     }
@@ -131,7 +129,7 @@
           break;
 
         default:
-          throw 'Unsupported $.ajax.concurrency type: ' + concurrency.type;
+          throw 'Unsupported $.ajax.concurrents type: ' + concurrency.type;
       }
     } else {
       storeConcurrent(key, jqXhr);

@@ -16,13 +16,13 @@ describe('Ajax pre-filters', function() {
       return xhr;
     },
     respond = function(response) {
-      Ajax.mostRecentCall.response(response || { status: status || 200, responseText: 'response' });
+      Ajax.mostRecentCall.response(response || { status: status || 200, responseText: 'OK' });
     };
 
   beforeEach(function() {
     // Reset concurrency and data cache
-    goodies.cached = {};
-    goodies.concurrency = {};
+    goodies.cache = {};
+    goodies.concurrents = {};
 
     // Mocking ajax and send method
     Ajax.useMock();
@@ -94,19 +94,19 @@ describe('Ajax pre-filters', function() {
 
     it('allows saving concurrency by key', function() {
       var xhr = ajax({ concurrency: { key: 'search', type: 'abort' }}, false);
-      expect(goodies.concurrency.search).toEqual(xhr);
+      expect(goodies.concurrents.search).toEqual(xhr);
     });
 
     it('saves concurrency by method + url + data', function() {
       var xhr = ajax({ concurrency: 'abort', data: { a: 1 } }, false);
-      expect(goodies.concurrency['get:text:a=1']).toEqual(xhr);
+      expect(goodies.concurrents['get:/test:a=1']).toEqual(xhr);
     });
 
     it('throws error for invalid concurrency type', function() {
       expect(function() {
         ajax({ concurrency: 'wrong' }, false);
         ajax({ concurrency: 'wrong' }, false);
-      }).toThrow('Unsupported $.ajax.concurrency type: wrong');
+      }).toThrow('Unsupported $.ajax.concurrents type: wrong');
     });
   });
 });

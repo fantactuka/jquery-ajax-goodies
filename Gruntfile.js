@@ -5,12 +5,26 @@ module.exports = function(grunt) {
     karma: {
       options: {
         configFile: 'spec/karma.conf.js',
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
         autoWatch: true
       },
-
       ci: {
-
+        options: {
+          browsers: ['PhantomJS'],
+          reporters: ['dots'],
+          autoWatch: false,
+          singleRun: true,
+          preprocessors: {
+            '**/app/**/*': 'coverage'
+          }
+        }
+      },
+      watch: {
+        options: {
+          browsers: ['PhantomJS'],
+          reporters: ['dots', 'growl'],
+          autoWatch: true
+        }
       }
     },
     uglify: {
@@ -32,6 +46,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test', ['jshint', 'karma', 'qunit']);
+  grunt.registerTask('test', ['jshint', 'karma:ci']);
   grunt.registerTask('default', ['test', 'uglify']);
 };
