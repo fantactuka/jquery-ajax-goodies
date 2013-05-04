@@ -1,5 +1,5 @@
 {
-    "name": "ajax-goodies",
+    "name": "jquery-ajax-goodies",
     "title": "Ajax goodies",
     "description": "jQuery plugin that adds `cached` and `concurrency` options for better requests management",
     "keywords": [
@@ -8,7 +8,7 @@
         "concurrent",
         "cache"
     ],
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": {
         "name": "Maksim Horbachevsky",
         "url": "https://github.com/fantactuka"
