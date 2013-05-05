@@ -23,7 +23,7 @@
   var goodies = $.ajax.goodies = {
     cache: {},
     concurrents: {},
-    version: '0.0.1'
+    version: '0.2.0'
   };
 
   /**
