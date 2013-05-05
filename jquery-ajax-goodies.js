@@ -75,6 +75,12 @@
     };
   }
 
+  function cleanCachedJqXhr(key, clean) {
+    if (clean !== false) {
+      delete goodies.cache[key];
+    }
+  }
+
   /**
    * Getting cached value depending on passed `cached` option: whether it date, ttl, function or boolean
    * @param {String} key - cache key
@@ -94,14 +100,16 @@
       case 'boolean':
         valid = value;
         break;
-      case 'number':
-        valid = cache.stamp < now - value;
-        break;
       case 'function':
         valid = !!value(cache);
         break;
       case 'object': // Date
         valid = now < +value;
+        cleanCachedJqXhr(key, !valid);
+        break;
+      case 'number':
+        valid = cache.stamp < now - value;
+        cleanCachedJqXhr(key, !valid);
         break;
       default:
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
