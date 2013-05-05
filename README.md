@@ -57,10 +57,11 @@ $.ajax({
   cached: new Date('01/01/2014') 
 }); 
 
-// Cache will be valid if function returns non-falsy value
+// Cache will be valid if function returns non-falsy value.
+// `cachedValue` is { stamp: <Date>, jqXhr: <jqXhr> } object
 $.ajax({ 
   url: 'test', 
-  cached: function(cachedValue) {
+  cached: function(cache) {
     ....
     return result;
   } 
