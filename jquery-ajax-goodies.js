@@ -70,7 +70,7 @@
    */
   function setCachedJqXhr(key, jqXhr) {
     goodies.cache[key] = {
-      xhr: jqXhr,
+      jqXhr: jqXhr,
       stamp: + new Date()
     };
   }
@@ -115,7 +115,7 @@
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
     }
 
-    return valid ? cache.xhr : null;
+    return valid ? cache.jqXhr : null;
   }
 
   /**
