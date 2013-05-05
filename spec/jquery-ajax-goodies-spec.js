@@ -65,6 +65,85 @@ describe('Ajax pre-filters', function() {
       expect(spy.callCount).toEqual(6);
       expect(error).not.toHaveBeenCalled();
     });
+
+    describe('as function', function() {
+      var spy;
+
+      beforeEach(function() {
+        spy = jasmine.createSpy('fn');
+      });
+
+      it('enables cache if returns true', function() {
+        spy.andReturn(true);
+        ajax({ cached: spy });
+        ajax({ cached: spy });
+
+        expect(send.callCount).toEqual(1);
+      });
+
+      it('disables cache if returns false', function() {
+        spy.andReturn(false);
+        ajax({ cached: spy });
+        ajax({ cached: spy });
+
+        expect(send.callCount).toEqual(2);
+      });
+    });
+
+    var withMockDate = function(value, fn) {
+      var original = window.Date;
+      window.Date = function() {
+        return new original(value);
+      };
+
+      fn();
+
+      window.Date = original;
+    };
+
+    describe('as date', function() {
+      it('enables cache if good enough', function() {
+        var date = new Date('02/02/2013');
+
+        withMockDate('01/01/2013', function() {
+          ajax({ cached: date });
+          ajax({ cached: date });
+          expect(send.callCount).toEqual(1);
+        });
+      });
+
+      it('disables cache if too old', function() {
+        var date = new Date('12/12/2012');
+
+        withMockDate('01/01/2013', function() {
+          ajax({ cached: date });
+          ajax({ cached: date });
+          expect(send.callCount).toEqual(2);
+        });
+      });
+    });
+
+    describe('as ttl stamp', function() {
+      it('enables cache if good enough', function() {
+        var stamp = -10000;
+
+        withMockDate('01/01/2013', function() {
+          ajax({ cached: stamp });
+          ajax({ cached: stamp });
+          expect(send.callCount).toEqual(1);
+        });
+      });
+
+      it('disables cache if too old', function() {
+        var stamp = 10000;
+
+        withMockDate('01/01/2013', function() {
+          ajax({ cached: stamp });
+          ajax({ cached: stamp });
+          expect(send.callCount).toEqual(2);
+        });
+      });
+    });
   });
 
   describe('`concurrency` option', function() {

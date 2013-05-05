@@ -23,7 +23,7 @@
   var goodies = $.ajax.goodies = {
     cache: {},
     concurrents: {},
-    version: '0.1.1'
+    version: '0.0.1'
   };
 
   /**
@@ -64,6 +64,53 @@
   }
 
   /**
+   * Storing xhr in cache with current time stamp
+   * @param {String} key
+   * @param {Object} jqXhr
+   */
+  function setCachedJqXhr(key, jqXhr) {
+    goodies.cache[key] = {
+      xhr: jqXhr,
+      stamp: + new Date()
+    };
+  }
+
+  /**
+   * Getting cached value depending on passed `cached` option: whether it date, ttl, function or boolean
+   * @param {String} key - cache key
+   * @param {*} value - cached option value
+   * @returns {*}
+   */
+  function getCachedJqXhr(key, value) {
+    var cache = goodies.cache[key],
+      now = + new Date(),
+      valid;
+
+    if (!cache) {
+      return null;
+    }
+
+    switch(typeof value) {
+      case 'boolean':
+        valid = value;
+        break;
+      case 'number':
+        valid = cache.stamp < now - value;
+        break;
+      case 'function':
+        valid = !!value(cache);
+        break;
+      case 'object': // Date
+        valid = now < +value;
+        break;
+      default:
+        throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
+    }
+
+    return valid ? cache.xhr : null;
+  }
+
+  /**
    * Ajax cache pre-filter. Adds `cached` option that allows permanent result caching if
    * value is true.
    *
@@ -80,7 +127,7 @@
   $.ajaxPrefilter(function(options, origOptions, jqXhr) {
     var key = createKey(options),
       cached = options.cached,
-      cachedJqXhr = cached && goodies.cache[key];
+      cachedJqXhr = cached && getCachedJqXhr(key, cached);
 
 
     if (cachedJqXhr) {
@@ -95,7 +142,7 @@
       if (cached) {
         jqXhr.success(function() {
           // Storing succeeded jqXhr object
-          goodies.cache[key] = jqXhr;
+          setCachedJqXhr(key, jqXhr);
         });
       }
     }
