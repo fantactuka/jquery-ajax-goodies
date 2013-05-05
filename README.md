@@ -69,10 +69,9 @@ $.ajax({
 ```
 
 **NOTE**
-Currently it only supports permanent cache during page-lifecycle without
-TTL or local-storage functionality.
+Currently it only supports permanent cache during page-lifecycle without local-storage functionality.
 
-It stores succeeded jqXhr object. When we have cached result, we abort
-new request and replace all properties/methods of current jqXhr with cached one. So
+It stores succeeded jqXhr object. When we have cached result, we prevent 
+new request from being sent and replace all properties/methods of current jqXhr with cached one. So
 when this merged jqXhr object is returned — it already a resolved deferred object,
 and adding any callbacks like .done, .fail, .always will be triggered immediately.
