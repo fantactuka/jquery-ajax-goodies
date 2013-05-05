@@ -43,6 +43,30 @@ $.ajax({ url: 'test', cached: true });    // Will run actual request
 $.ajax({ url: 'test', cached: true });    // Returns cached jqXhr, and does not run request
 ```
 
+Alternatives:
+```js
+// Cache will be valid during next 10000 ms
+$.ajax({ 
+  url: 'test', 
+  cached: 10000 
+}); 
+
+// Cache will be valid due date
+$.ajax({ 
+  url: 'test', 
+  cached: new Date('01/01/2014') 
+}); 
+
+// Cache will be valid if function returns non-falsy value
+$.ajax({ 
+  url: 'test', 
+  cached: function(cachedValue) {
+    ....
+    return result;
+  } 
+}); 
+```
+
 **NOTE**
 Currently it only supports permanent cache during page-lifecycle without
 TTL or local-storage functionality.
