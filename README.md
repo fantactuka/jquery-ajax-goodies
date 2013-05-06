@@ -4,7 +4,7 @@ jquery-ajax-goodies v0.2.0 [![Build Status](https://travis-ci.org/fantactuka/jqu
 Adding `cached` and `concurrency` options for better requests managing.
 
 # Installation
-Just copy [jquery-ajax-goodies.js](https://raw.github.com/fantactuka/jquery-ajax-goodies/master/jquery-ajax-goodies.js)
+Using [Bower](http://twitter.github.com/bower/) `bower install jquery-ajax-goodies` or just copy [jquery-ajax-goodies.js](https://raw.github.com/fantactuka/jquery-ajax-goodies/master/jquery-ajax-goodies.js)
 
 # Usage
 ## Concurrency 
