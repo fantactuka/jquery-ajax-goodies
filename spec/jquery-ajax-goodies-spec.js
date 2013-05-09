@@ -31,39 +31,69 @@ describe('Ajax pre-filters', function() {
   });
 
   describe('`cached` option', function() {
-    it('sends regular request if not cached yet', function() {
-      ajax({ cached: true });
-      expect(send).toHaveBeenCalled();
+    describe('xhr', function() {
+      it('sends regular request if not cached yet', function() {
+        ajax({ cached: true });
+        expect(send).toHaveBeenCalled();
+      });
+
+      it('sends regular request if no `cached` passed', function() {
+        ajax();
+        ajax();
+        expect(send.callCount).toEqual(2);
+      });
+
+      it('does not send request if already cached', function() {
+        ajax({ cached: true });
+        ajax({ cached: true });
+
+        expect(send.callCount).toEqual(1);
+      });
     });
 
-    it('sends regular request if no `cached` passed', function() {
-      ajax();
-      ajax();
-      expect(send.callCount).toEqual(2);
-    });
+    describe('cached xhr', function() {
+      var xhr, cachedXhr;
 
-    it('does not send request if already cached', function() {
-      ajax({ cached: true });
-      ajax({ cached: true });
+      beforeEach(function() {
+        xhr = ajax({ cached: true });
+        cachedXhr = ajax({ cached: true });
+      });
 
-      expect(send.callCount).toEqual(1);
-    });
+      it('runs all callbacks when using cached result', function() {
+        var error = jasmine.createSpy('error');
 
-    it('runs all callbacks when using cached result', function() {
-      var error = jasmine.createSpy('error');
+        ajax({
+          cached: true,
+          error: error,
+          success: spy,
+          complete: spy
+        }).done(spy).success(spy)
+          .fail(error).error(error)
+          .always(spy).complete(spy);
 
-      ajax({ cached: true });
-      ajax({
-        cached: true,
-        error: error,
-        success: spy,
-        complete: spy
-      }).done(spy).success(spy)
-        .fail(error).error(error)
-        .always(spy).complete(spy);
+        expect(spy.callCount).toEqual(6);
+        expect(error).not.toHaveBeenCalled();
+      });
 
-      expect(spy.callCount).toEqual(6);
-      expect(error).not.toHaveBeenCalled();
+      it('has stubbed non-active helpers', function() {
+        $.each('setRequestHeader overrideMimeType statusCode abort'.split(' '), function(i, helper) {
+          expect(typeof cachedXhr[helper]).toEqual('function');
+        });
+      });
+
+      it('returns same response headers string', function() {
+        expect(cachedXhr.getAllResponseHeaders()).toEqual(xhr.getAllResponseHeaders());
+      });
+
+      it('returns correct response header by name', function() {
+        expect(cachedXhr.getResponseHeader('content-type')).toEqual(xhr.getResponseHeader('content-type'));
+      });
+
+      it('copies all properties', function() {
+        $.each('responseText responseXML readyState status statusText'.split(' '), function(i, property) {
+          expect(cachedXhr[property]).toEqual(xhr[property]);
+        });
+      });
     });
 
     describe('as function', function() {

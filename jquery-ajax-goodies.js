@@ -68,10 +68,10 @@
    * @param {String} key
    * @param {Object} jqXhr
    */
-  function setCachedJqXhr(key, jqXhr) {
+  function setCacheItem(key, jqXhr) {
     goodies.cache[key] = {
       jqXhr: jqXhr,
-      stamp: + new Date()
+      stamp: +new Date()
     };
   }
 
@@ -87,16 +87,16 @@
    * @param {*} value - cached option value
    * @returns {*}
    */
-  function getCachedJqXhr(key, value) {
+  function getCacheItem(key, value) {
     var cache = goodies.cache[key],
-      now = + new Date(),
+      now = +new Date(),
       valid;
 
     if (!cache) {
       return null;
     }
 
-    switch(typeof value) {
+    switch (typeof value) {
       case 'boolean':
         valid = value;
         break;
@@ -118,6 +118,54 @@
     return valid ? cache.jqXhr : null;
   }
 
+  function createMockXhr(options) {
+    var deferred = $.Deferred(),
+      mockXhr = {},
+      headersObject,
+      headersString = options.responseHeaders,
+      headersRegExp = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
+
+    // These helpers have no affect on request when it's done, so just noop-ing it
+    $.each('setRequestHeader overrideMimeType statusCode abort'.split(' '), function(i, helper) {
+      mockXhr[helper] = $.noop;
+    });
+
+    // Copy all plain properties
+    $.each('responseText responseXML readyState status statusText'.split(' '), function(i, property) {
+      mockXhr[property] = options[property];
+    });
+
+    // Mock all headers string getter
+    mockXhr.getAllResponseHeaders = function() {
+      return headersString;
+    };
+
+    // Mock single header getter
+    mockXhr.getResponseHeader = function(key) {
+      var match;
+
+      if (!headersObject) {
+        headersObject = {};
+        while ((match = headersRegExp.exec(headersString))) {
+          headersObject[ match[1].toLowerCase() ] = match[ 2 ];
+        }
+      }
+
+      match = headersObject[ key.toLowerCase() ];
+      return match || null;
+    };
+
+    // Resolving deferred with cached response and status text
+    deferred.resolve(options.response, options.statusText).promise(mockXhr);
+
+    // Aliases for ajax promise
+    mockXhr.success = mockXhr.done;
+    mockXhr.error = mockXhr.fail;
+    mockXhr.complete = mockXhr.always;
+
+    return mockXhr;
+  }
+
   /**
    * Ajax cache pre-filter. Adds `cached` option that allows permanent result caching if
    * value is true.
@@ -135,22 +183,30 @@
   $.ajaxPrefilter(function(options, origOptions, jqXhr) {
     var key = createKey(options),
       cached = options.cached,
-      cachedJqXhr = cached && getCachedJqXhr(key, cached);
+      cachedData = cached && getCacheItem(key, cached);
 
 
-    if (cachedJqXhr) {
+    if (cachedData) {
       jqXhr.abort();
 
-      // Replacing current jqXhr with cached one
-      $.extend(jqXhr, cachedJqXhr);
+      // Replacing current jqXhr with mocked
+      var xhr = createMockXhr(cachedData);
+      $.extend(jqXhr, xhr);
 
       // Adding callbacks that was passed as standard jqXhr options
       jqXhr.then(options.success, options.error).always(options.complete);
     } else {
       if (cached) {
-        jqXhr.success(function() {
-          // Storing succeeded jqXhr object
-          setCachedJqXhr(key, jqXhr);
+        jqXhr.success(function(response) {
+          setCacheItem(key, {
+            response: response,
+            responseText: jqXhr.responseText,
+            responseXML: jqXhr.responseXML,
+            readyState: jqXhr.readyState,
+            status: jqXhr.status,
+            statusText: jqXhr.statusText,
+            responseHeaders: jqXhr.getAllResponseHeaders()
+          });
         });
       }
     }
