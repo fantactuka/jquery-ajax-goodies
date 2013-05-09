@@ -66,11 +66,11 @@
   /**
    * Storing xhr in cache with current time stamp
    * @param {String} key
-   * @param {Object} jqXhr
+   * @param {Object} data
    */
-  function setCacheItem(key, jqXhr) {
+  function setCacheItem(key, data) {
     goodies.cache[key] = {
-      jqXhr: jqXhr,
+      data: data,
       stamp: +new Date()
     };
   }
@@ -115,7 +115,7 @@
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
     }
 
-    return valid ? cache.jqXhr : null;
+    return valid ? cache.data : null;
   }
 
   function createMockXhr(options) {
