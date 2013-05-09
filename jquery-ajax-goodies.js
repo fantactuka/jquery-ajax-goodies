@@ -75,7 +75,7 @@
     };
   }
 
-  function cleanCachedJqXhr(key, clean) {
+  function removeCacheItem(key, clean) {
     if (clean !== false) {
       delete goodies.cache[key];
     }
@@ -105,11 +105,11 @@
         break;
       case 'object': // Date
         valid = now < +value;
-        cleanCachedJqXhr(key, !valid);
+        removeCacheItem(key, !valid);
         break;
       case 'number':
         valid = cache.stamp < now - value;
-        cleanCachedJqXhr(key, !valid);
+        removeCacheItem(key, !valid);
         break;
       default:
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
