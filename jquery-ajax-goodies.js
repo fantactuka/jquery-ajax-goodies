@@ -18,14 +18,14 @@
 })(function($) {
 
   var goodies = $.ajax.goodies = {
-    version: '0.2.1'
+    version: '0.3.0'
   };
 
   goodies.cached = {
     setAdapter: function(adapter) {
       each('setItem getItem removeItem', function(method) {
         if (!adapter[method]) {
-          throwError('Method "{method}" is not implemented in adapter', { method: method })
+          throwError('Method "{method}" is not implemented in adapter', { method: method });
         }
       });
 
@@ -87,7 +87,7 @@
       status: jqXhr.status,
       statusText: jqXhr.statusText,
       responseHeaders: jqXhr.getAllResponseHeaders()
-    }
+    };
   }
 
   function unflattenXhr(options) {
