@@ -8,7 +8,7 @@
         "concurrent",
         "cache"
     ],
-    "version": "0.2.0",
+    "version": "0.2.1",
     "author": {
         "name": "Maksim Horbachevsky",
         "url": "https://github.com/fantactuka"
