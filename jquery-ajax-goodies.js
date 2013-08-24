@@ -59,8 +59,8 @@
     };
   }
 
-  function checkCacheItem(key, clean) {
-    if (clean !== false) {
+  function checkCacheItem(key, valid) {
+    if (valid !== false) {
       delete goodies.cache[key];
     }
   }
@@ -89,16 +89,15 @@
         break;
       case 'object': // Date
         valid = now < +value;
-        checkCacheItem(key, !valid);
         break;
       case 'number':
         valid = cache.stamp > now - value;
-        checkCacheItem(key, !valid);
         break;
       default:
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
     }
 
+    checkCacheItem(key, !valid);
     return valid ? cache.data : null;
   }
 
@@ -175,7 +174,7 @@
     },
 
     getDefaultAdapter: function() {
-      return this.adapters[this.defaultAdapter];
+      return this.getAdapter(this.defaultAdapter);
     },
 
     setDefaultAdapter: function(name) {
@@ -185,6 +184,27 @@
     }
 
   };
+
+
+  goodies.cached.setAdapter('object', (function() {
+
+    var storage = {};
+
+    return {
+      setItem: function(name, value) {
+        storage[name] = value;
+      },
+
+      getItem: function(name) {
+        return storage[name];
+      },
+
+      removeItem: function() {
+        delete storage[name];
+      }
+    }
+
+  })(), true);
 
   /**
    * Ajax cache pre-filter. Adds `cached` option that allows permanent result caching if
