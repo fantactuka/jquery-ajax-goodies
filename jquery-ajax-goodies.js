@@ -20,11 +20,23 @@
    * Extension storage. Exposed as public property to allow better testability and debugging
    * @type {Object}
    */
+//  var goodies = $.ajax.goodies = {
+//    cache: {},
+//    concurrents: {},
+//    version: '0.2.1'
+//  };
+
   var goodies = $.ajax.goodies = {
-    cache: {},
-    concurrents: {},
     version: '0.2.1'
   };
+
+  function throwError(message, values) {
+    message = message.replace(/\{([^{}]+)\}/g, function(match, name) {
+      return values[name];
+    });
+
+    throw new Error('$.ajax.goodies: ' + message);
+  }
 
   /**
    * Creating key for passed request settings, using type, url and data
@@ -33,34 +45,6 @@
    */
   function createKey(options) {
     return [options.type, options.url, options.data].join(':').toLowerCase();
-  }
-
-  /**
-   * Stores concurrent request in local cache and delete it when request
-   * completed (whether with error or success)
-   * @param {String} key
-   * @param {XMLHttpRequest} jqXhr - jquery xhr deferred
-   */
-  function storeConcurrent(key, jqXhr) {
-    goodies.concurrents[key] = jqXhr;
-    jqXhr.always(function() {
-      delete goodies.concurrents[key];
-    });
-  }
-
-  /**
-   * Parsing concurrency option into object with predefined key and type, or return
-   * null if concurrency is not configured
-   * @param {Object} options
-   * @return {Object|null}
-   */
-  function parseConcurrency(options) {
-    var concurrency = options.concurrency;
-
-    return concurrency && {
-      type: (typeof concurrency === 'string') ? concurrency : concurrency.type,
-      key: concurrency.key || createKey(options)
-    };
   }
 
   /**
@@ -166,6 +150,42 @@
     return mockXhr;
   }
 
+  goodies.cached = {
+
+    adapters: {},
+
+    setAdapter: function(name, adapter, useAsDefault) {
+      var adapterMethods = ['setItem', 'getItem', 'removeItem'];
+
+      $.each(adapterMethods, function(i, method) {
+        if (!adapter[method]) {
+          throwError('Method "{method}" is not implemented in "{name}" adapter', { method: method, name: name })
+        }
+      });
+
+      this.adapters[name] = adapter;
+
+      if (useAsDefault) {
+        this.setDefaultAdapter(name);
+      }
+    },
+
+    getAdapter: function(name) {
+      return this.adapters[name] || throwError('Adapter "{name}" does not exist', { name: name });
+    },
+
+    getDefaultAdapter: function() {
+      return this.adapters[this.defaultAdapter];
+    },
+
+    setDefaultAdapter: function(name) {
+      if (this.getAdapter(name)) {
+        this.defaultAdapter = name;
+      }
+    }
+
+  };
+
   /**
    * Ajax cache pre-filter. Adds `cached` option that allows permanent result caching if
    * value is true.
@@ -211,6 +231,34 @@
       }
     }
   });
+
+  /**
+   * Stores concurrent request in local cache and delete it when request
+   * completed (whether with error or success)
+   * @param {String} key
+   * @param {XMLHttpRequest} jqXhr - jquery xhr deferred
+   */
+  function storeConcurrent(key, jqXhr) {
+    goodies.concurrents[key] = jqXhr;
+    jqXhr.always(function() {
+      delete goodies.concurrents[key];
+    });
+  }
+
+  /**
+   * Parsing concurrency option into object with predefined key and type, or return
+   * null if concurrency is not configured
+   * @param {Object} options
+   * @return {Object|null}
+   */
+  function parseConcurrency(options) {
+    var concurrency = options.concurrency;
+
+    return concurrency && {
+      type: (typeof concurrency === 'string') ? concurrency : concurrency.type,
+      key: concurrency.key || createKey(options)
+    };
+  }
 
   /**
    * Ajax concurrency pre-filter. Adds `concurrency` option that allows to manage
