@@ -37,26 +37,32 @@ we specified concurrency key.
 
 Adds `cached` option that allows permanent result caching if value is true.
 
-Example:
+#### Simple caching
 ```js
 $.ajax({ url: 'test', cached: true });    // Will run actual request
 $.ajax({ url: 'test', cached: true });    // Returns cached jqXhr, and does not run request
 ```
 
-Alternatives:
+#### Time-to-live invalidation
 ```js
 // Cache will be valid during next 10000 ms
 $.ajax({ 
   url: 'test', 
   cached: 10000 
 }); 
+```
 
+#### Date-based cache invalidation
+```js
 // Cache will be valid due date
 $.ajax({ 
   url: 'test', 
   cached: new Date('01/01/2014') 
-}); 
+});
+```
 
+#### Function cache invalidation
+```js
 // Cache will be valid if function returns non-falsy value.
 // `cachedValue` is { stamp: <Date>, jqXhr: <jqXhr> } object
 $.ajax({ 
@@ -68,5 +74,23 @@ $.ajax({
 }); 
 ```
 
-**NOTE**
-Currently it only supports permanent cache during page-lifecycle without local-storage functionality.
+#### Local storage
+By default cache is a run-time object, that means when you reload the page — it's invalidated. You're able to override
+default cache adapter to support local storage functionality:
+
+```
+$.ajax.goodies.cached.setAdapter({
+  setItem: function(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+
+  getItem: function(key) {
+    var value = localStorage.getItem(key);
+    return JSON.parse(value);
+  },
+
+  removeItem: function(key) {
+    localStorage.removeItem(key);
+  }
+});
+```
