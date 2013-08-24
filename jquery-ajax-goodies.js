@@ -55,8 +55,8 @@
 
   function getRelevantData(cachedData, relevance) {
     var data = cachedData.data,
-      stamp = cachedData.stamp,
-      valid;
+        stamp = cachedData.stamp,
+        valid;
 
     switch (typeof relevance) {
       case 'boolean':
@@ -92,10 +92,10 @@
 
   function unflattenXhr(options) {
     var deferred = $.Deferred(),
-      mockXhr = {},
-      headersObject,
-      headersString = options.responseHeaders,
-      headersRegExp = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
+        mockXhr = {},
+        headersObject,
+        headersString = options.responseHeaders,
+        headersRegExp = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
 
     // These helpers have no affect on request when it's done, so just noop-ing it
     each('setRequestHeader overrideMimeType statusCode abort', function(helper) {
@@ -190,9 +190,9 @@
     }
 
     var requestKey = buildRequestKey(options),
-      adapter = goodies.cached.getAdapter(),
-      cachedItem = adapter.getItem(requestKey),
-      relevantData = cachedItem && getRelevantData(cachedItem, options.cached);
+        adapter = goodies.cached.getAdapter(),
+        cachedItem = adapter.getItem(requestKey),
+        relevantData = cachedItem && getRelevantData(cachedItem, options.cached);
 
     if (relevantData) {
 
@@ -273,8 +273,8 @@
    */
   $.ajaxPrefilter(function(options, origOptions, jqXhr) {
     var key,
-      concurrent,
-      concurrency = parseConcurrency(options);
+        concurrent,
+        concurrency = parseConcurrency(options);
 
     if (!concurrency) {
       return;
