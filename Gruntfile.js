@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   'use strict';
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('bower.json'),
     karma: {
       options: {
         configFile: 'spec/karma.conf.js',
@@ -42,7 +43,7 @@ module.exports = function(grunt) {
     },
     version: {
       update: {
-        src: ['component.json', 'package.json']
+        src: ['bower.json', 'package.json', 'jquery-ajax-goodies.jquery.json', 'jquery-ajax-goodies.js']
       }
     }
   });
