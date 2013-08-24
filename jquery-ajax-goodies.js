@@ -16,92 +16,81 @@
     factory(window.jQuery);
   }
 })(function($) {
-  /**
-   * Extension storage. Exposed as public property to allow better testability and debugging
-   * @type {Object}
-   */
-//  var goodies = $.ajax.goodies = {
-//    cache: {},
-//    concurrents: {},
-//    version: '0.2.1'
-//  };
 
   var goodies = $.ajax.goodies = {
     version: '0.2.1'
   };
 
-  function throwError(message, values) {
-    message = message.replace(/\{([^{}]+)\}/g, function(match, name) {
-      return values[name];
-    });
+  goodies.cached = {
+    setAdapter: function(adapter) {
+      each('setItem getItem removeItem', function(method) {
+        if (!adapter[method]) {
+          throwError('Method "{method}" is not implemented in adapter', { method: method })
+        }
+      });
 
-    throw new Error('$.ajax.goodies: ' + message);
-  }
+      this._adapter = adapter;
+    },
 
-  /**
-   * Creating key for passed request settings, using type, url and data
-   * @param {Object} options
-   * @return {String}
-   */
-  function createKey(options) {
-    return [options.type, options.url, options.data].join(':').toLowerCase();
-  }
-
-  /**
-   * Storing xhr in cache with current time stamp
-   * @param {String} key
-   * @param {Object} data
-   */
-  function setCacheItem(key, data) {
-    goodies.cache[key] = {
-      data: data,
-      stamp: +new Date()
-    };
-  }
-
-  function checkCacheItem(key, valid) {
-    if (valid !== false) {
-      delete goodies.cache[key];
+    getAdapter: function() {
+      return this._adapter || throwError('Adapter does not defined');
     }
-  }
+  };
 
-  /**
-   * Getting cached value depending on passed `cached` option: whether it date, ttl, function or boolean
-   * @param {String} key - cache key
-   * @param {*} value - cached option value
-   * @returns {*}
-   */
-  function getCacheItem(key, value) {
-    var cache = goodies.cache[key],
-      now = +new Date(),
+  goodies.cached.setAdapter({
+    storage: {},
+
+    setItem: function(key, value) {
+      this.storage[key] = value;
+    },
+
+    getItem: function(key) {
+      return this.storage[key];
+    },
+
+    removeItem: function(key) {
+      delete this.storage[key];
+    }
+  });
+
+  function getRelevantData(cachedData, relevance) {
+    var data = cachedData.data,
+      stamp = cachedData.stamp,
       valid;
 
-    if (!cache) {
-      return null;
-    }
-
-    switch (typeof value) {
+    switch (typeof relevance) {
       case 'boolean':
-        valid = value;
+        valid = relevance;
         break;
       case 'function':
-        valid = !!value(cache);
+        valid = !!relevance(data, stamp);
         break;
-      case 'object': // Date
-        valid = now < +value;
+      case 'object':
+        valid = now() < +relevance;
         break;
       case 'number':
-        valid = cache.stamp > now - value;
+        valid = stamp > now() - relevance;
         break;
       default:
-        throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;
+        throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + relevance;
     }
 
-    checkCacheItem(key, !valid);
-    return valid ? cache.data : null;
+    return valid ? data : null;
   }
 
-  function createMockXhr(options) {
+  function flattenXhr(jqXhr, response) {
+    return {
+      response: response,
+      responseText: jqXhr.responseText,
+      responseXML: jqXhr.responseXML,
+      readyState: jqXhr.readyState,
+      status: jqXhr.status,
+      statusText: jqXhr.statusText,
+      responseHeaders: jqXhr.getAllResponseHeaders()
+    }
+  }
+
+  function unflattenXhr(options) {
     var deferred = $.Deferred(),
       mockXhr = {},
       headersObject,
@@ -109,12 +98,12 @@
       headersRegExp = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg;
 
     // These helpers have no affect on request when it's done, so just noop-ing it
-    $.each('setRequestHeader overrideMimeType statusCode abort'.split(' '), function(i, helper) {
+    each('setRequestHeader overrideMimeType statusCode abort', function(helper) {
       mockXhr[helper] = $.noop;
     });
 
     // Copy all plain properties
-    $.each('responseText responseXML readyState status statusText'.split(' '), function(i, property) {
+    each('responseText responseXML readyState status statusText', function(property) {
       mockXhr[property] = options[property];
     });
 
@@ -130,11 +119,11 @@
       if (!headersObject) {
         headersObject = {};
         while ((match = headersRegExp.exec(headersString))) {
-          headersObject[ match[1].toLowerCase() ] = match[ 2 ];
+          headersObject[match[1].toLowerCase()] = match[2];
         }
       }
 
-      match = headersObject[ key.toLowerCase() ];
+      match = headersObject[key.toLowerCase()];
       return match || null;
     };
 
@@ -149,106 +138,87 @@
     return mockXhr;
   }
 
-  goodies.cached = {
+  function now() {
+    return +new Date();
+  }
 
-    adapters: {},
+  function each(string, fn) {
+    $.each(string.split(' '), function(i, item) {
+      fn(item);
+    });
+  }
 
-    setAdapter: function(name, adapter, useAsDefault) {
-      var adapterMethods = ['setItem', 'getItem', 'removeItem'];
+  function throwError(message, values) {
+    values = values || {};
+    message = message.replace(/\{([^{}]+)\}/g, function(match, name) {
+      return values[name];
+    });
 
-      $.each(adapterMethods, function(i, method) {
-        if (!adapter[method]) {
-          throwError('Method "{method}" is not implemented in "{name}" adapter', { method: method, name: name })
-        }
-      });
+    throw new Error('$.ajax.goodies: ' + message);
+  }
 
-      this.adapters[name] = adapter;
-
-      if (useAsDefault) {
-        this.setDefaultAdapter(name);
-      }
-    },
-
-    getAdapter: function(name) {
-      return this.adapters[name] || throwError('Adapter "{name}" does not exist', { name: name });
-    },
-
-    getDefaultAdapter: function() {
-      return this.getAdapter(this.defaultAdapter);
-    },
-
-    setDefaultAdapter: function(name) {
-      if (this.getAdapter(name)) {
-        this.defaultAdapter = name;
-      }
-    }
-
-  };
-
-
-  goodies.cached.setAdapter('object', (function() {
-
-    var storage = {};
-
-    return {
-      setItem: function(name, value) {
-        storage[name] = value;
-      },
-
-      getItem: function(name) {
-        return storage[name];
-      },
-
-      removeItem: function() {
-        delete storage[name];
-      }
-    }
-
-  })(), true);
+  /**
+   * Creating key for passed request settings, using type, url and data
+   * @param {Object} options
+   * @return {String}
+   */
+  function buildRequestKey(options) {
+    return [options.type, options.url, options.data].join(':').toLowerCase();
+  }
 
   /**
    * Ajax cache pre-filter. Adds `cached` option that allows permanent result caching if
    * value is true.
    *
+   *
+   *
    * Example:
    *    $.ajax({ url: 'test', cached: true });    // Will run actual request
    *    $.ajax({ url: 'test', cached: true });    // Returns cached jqXhr, and does not run request
    *
-   * NOTE:
+   *
+   *
+   * How it works:
    * It stores succeeded jqXhr object. When we have cached result, we abort
    * new request and replace all properties/methods of current jqXhr with cached one. So
    * when this merged jqXhr object is returned — it already a resolved deferred object,
    * and adding any callbacks like .done, .fail, .always will be triggered immediately.
    */
   $.ajaxPrefilter(function(options, origOptions, jqXhr) {
-    var key = createKey(options),
-      cached = options.cached,
-      cachedData = cached && getCacheItem(key, cached);
+    if (!options.cached) {
+      return;
+    }
 
+    var requestKey = buildRequestKey(options),
+      adapter = goodies.cached.getAdapter(),
+      cachedItem = adapter.getItem(requestKey),
+      relevantData = cachedItem && getRelevantData(cachedItem, options.cached);
 
-    if (cachedData) {
+    if (relevantData) {
+
+      // Aborting current request
       jqXhr.abort();
 
       // Replacing current jqXhr with mocked
-      var xhr = createMockXhr(cachedData);
+      var xhr = unflattenXhr(relevantData);
       $.extend(jqXhr, xhr);
 
       // Adding callbacks that was passed as standard jqXhr options
       jqXhr.then(options.success, options.error).always(options.complete);
     } else {
-      if (cached) {
-        jqXhr.success(function(response) {
-          setCacheItem(key, {
-            response: response,
-            responseText: jqXhr.responseText,
-            responseXML: jqXhr.responseXML,
-            readyState: jqXhr.readyState,
-            status: jqXhr.status,
-            statusText: jqXhr.statusText,
-            responseHeaders: jqXhr.getAllResponseHeaders()
-          });
-        });
+
+      // If any data was cached but no longer relevant
+      if (cachedItem) {
+        adapter.removeItem(requestKey);
       }
+
+      // Caching response data
+      jqXhr.success(function(response) {
+        adapter.setItem(requestKey, {
+          data: flattenXhr(jqXhr, response),
+          stamp: now()
+        });
+      });
     }
   });
 
@@ -276,7 +246,7 @@
 
     return concurrency && {
       type: (typeof concurrency === 'string') ? concurrency : concurrency.type,
-      key: concurrency.key || createKey(options)
+      key: concurrency.key || buildRequestKey(options)
     };
   }
 

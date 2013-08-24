@@ -21,7 +21,7 @@ describe('Ajax pre-filters', function() {
 
   beforeEach(function() {
     // Reset concurrency and data cache
-    goodies.cache = {};
+    goodies.cached.getAdapter().storage = {};
     goodies.concurrents = {};
 
     // Mocking ajax and send method
