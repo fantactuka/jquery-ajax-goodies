@@ -75,7 +75,7 @@
     };
   }
 
-  function removeCacheItem(key, clean) {
+  function checkCacheItem(key, clean) {
     if (clean !== false) {
       delete goodies.cache[key];
     }
@@ -105,11 +105,11 @@
         break;
       case 'object': // Date
         valid = now < +value;
-        removeCacheItem(key, !valid);
+        checkCacheItem(key, !valid);
         break;
       case 'number':
-        valid = cache.stamp < now - value;
-        removeCacheItem(key, !valid);
+        valid = cache.stamp > now - value;
+        checkCacheItem(key, !valid);
         break;
       default:
         throw 'Invalid `cached` option value. Expected Number, Boolean, Function or Date, but got ' + value;

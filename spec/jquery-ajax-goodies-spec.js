@@ -155,7 +155,7 @@ describe('Ajax pre-filters', function() {
 
     describe('as ttl stamp', function() {
       it('enables cache if good enough', function() {
-        var stamp = -10000;
+        var stamp = 10000;
 
         withMockDate('01/01/2013', function() {
           ajax({ cached: stamp });
@@ -165,7 +165,7 @@ describe('Ajax pre-filters', function() {
       });
 
       it('disables cache if too old', function() {
-        var stamp = 10000;
+        var stamp = -10000;
 
         withMockDate('01/01/2013', function() {
           ajax({ cached: stamp });
