@@ -18,7 +18,8 @@
 })(function($) {
 
   var goodies = $.ajax.goodies = {
-    version: '0.3.0'
+    version: '0.3.0',
+    concurrents : []
   };
 
   goodies.cached = {
@@ -281,7 +282,7 @@
     }
 
     key = concurrency.key;
-    concurrent = goodies.concurrents[key];
+    concurrent = goodies.concurrents[key] ? goodies.concurrents[key] : null;
 
     if (concurrent) {
       switch (concurrency.type) {
