@@ -18,7 +18,8 @@
 })(function($) {
 
   var goodies = $.ajax.goodies = {
-    version: '0.3.0'
+    version: '0.3.0',
+    concurrents: {}
   };
 
   goodies.cached = {

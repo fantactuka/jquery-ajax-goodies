@@ -20,10 +20,6 @@ describe('Ajax pre-filters', function() {
     };
 
   beforeEach(function() {
-    // Reset concurrency and data cache
-    goodies.cached.getAdapter().storage = {};
-    goodies.concurrents = {};
-
     // Mocking ajax and send method
     Ajax.useMock();
     spy = jasmine.createSpy('spy');
@@ -31,6 +27,11 @@ describe('Ajax pre-filters', function() {
   });
 
   describe('`cached` option', function() {
+    afterEach(function() {
+      // Reset data cache
+      goodies.cached.getAdapter().storage = {};
+    });
+
     describe('xhr', function() {
       it('sends regular request if not cached yet', function() {
         ajax({ cached: true });
@@ -177,6 +178,15 @@ describe('Ajax pre-filters', function() {
   });
 
   describe('`concurrency` option', function() {
+    afterEach(function() {
+      // Reset concurrency cache
+      goodies.concurrents = {};
+    });
+
+    it('has concurrents storage defined', function() {
+      expect($.ajax.goodies.concurrents).toEqual({});
+    });
+
     it('sends regular request if no concurrents', function() {
       ajax();
       expect(send).toHaveBeenCalled();
