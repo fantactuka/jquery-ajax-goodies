@@ -1,7 +1,7 @@
-jquery-ajax-goodies v0.2.0 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
+jquery-ajax-goodies v0.3.0 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
 ==================
 
-Adding `cached` and `concurrency` options for better requests managing.
+Adding `cached` (including ttl, optional local storage support) and `concurrency` (aborting or ignoring concurrent requests) options for better requests managing.
 
 # Installation
 Using [Bower](http://twitter.github.com/bower/) `bower install jquery-ajax-goodies` or just copy [jquery-ajax-goodies.js](https://raw.github.com/fantactuka/jquery-ajax-goodies/master/jquery-ajax-goodies.js)
@@ -64,10 +64,10 @@ $.ajax({
 #### Function cache invalidation
 ```js
 // Cache will be valid if function returns non-falsy value.
-// `cachedValue` is { stamp: <Date>, jqXhr: <jqXhr> } object
+// `data` is cached response, stamp - cache time stamp
 $.ajax({ 
   url: 'test', 
-  cached: function(cache) {
+  cached: function(data, stamp) {
     ....
     return result;
   } 
@@ -78,7 +78,7 @@ $.ajax({
 By default cache is a run-time object, that means when you reload the page — it's invalidated. You're able to override
 default cache adapter to support local storage functionality:
 
-```
+```js
 $.ajax.goodies.cached.setAdapter({
   setItem: function(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
@@ -94,3 +94,5 @@ $.ajax.goodies.cached.setAdapter({
   }
 });
 ```
+
+*Note* that adapter should implement `getItem`, `setItem`, `removeItem` methods to be fully functional.
