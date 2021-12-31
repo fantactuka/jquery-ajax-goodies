@@ -1,4 +1,4 @@
-jquery-ajax-goodies v0.3.1 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
+jquery-ajax-goodies v0.3.2 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
 ==================
 
 Adding `cached` (including ttl, optional local storage support) and `concurrency` (aborting or ignoring concurrent requests) options for better requests managing.
