@@ -1,16 +1,16 @@
 {
-  "name": "jquery-ajax-goodies",
-  "version": "0.3.1",
-  "scripts": {
-    "test": "grunt test"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "grunt": "0.4.0",
-    "grunt-karma": "0.4.4",
-    "grunt-contrib-jshint": "0.1.1",
-    "grunt-contrib-uglify": "0.1.1",
-    "grunt-contrib-qunit": "0.1.1",
-    "grunt-version": "0.2.1"
-  }
+    "name": "jquery-ajax-goodies",
+    "version": "0.3.2",
+    "scripts": {
+        "test": "grunt test"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "0.4.0",
+        "grunt-karma": "0.4.4",
+        "grunt-contrib-jshint": "0.1.1",
+        "grunt-contrib-uglify": "0.1.1",
+        "grunt-contrib-qunit": "0.1.1",
+        "grunt-version": "0.2.1"
+    }
 }

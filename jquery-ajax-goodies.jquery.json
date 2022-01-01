@@ -8,19 +8,16 @@
         "concurrent",
         "cache"
     ],
-    "version": "0.3.1",
+    "version": "0.3.2",
     "author": {
         "name": "Maksim Horbachevsky",
         "url": "https://github.com/fantactuka"
     },
-    "maintainers": [
-    ],
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "https://github.com/fantactuka/jquery-ajax-goodies/LICENSE"
-        }
-    ],
+    "maintainers": [],
+    "licenses": [{
+        "type": "MIT",
+        "url": "https://github.com/fantactuka/jquery-ajax-goodies/LICENSE"
+    }],
     "bugs": "https://github.com/fantactuka/jquery-ajax-goodies/issues",
     "homepage": "https://github.com/fantactuka/jquery-ajax-goodies",
     "docs": "https://github.com/fantactuka/jquery-ajax-goodies",

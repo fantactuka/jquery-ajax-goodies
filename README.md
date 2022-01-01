@@ -1,10 +1,10 @@
-jquery-ajax-goodies v0.3.1 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
+jquery-ajax-goodies v0.3.2 [![Build Status](https://travis-ci.org/fantactuka/jquery-ajax-goodies.png?branch=master)](https://travis-ci.org/fantactuka/jquery-ajax-goodies)
 ==================
 
 Adding `cached` (including ttl, optional local storage support) and `concurrency` (aborting or ignoring concurrent requests) options for better requests managing.
 
 # Installation
-Using [Bower](http://twitter.github.com/bower/) `bower install jquery-ajax-goodies` or just copy [jquery-ajax-goodies.js](https://raw.github.com/fantactuka/jquery-ajax-goodies/master/jquery-ajax-goodies.js)
+Just copy [jquery-ajax-goodies.js](https://raw.githubusercontent.com/aavision/jquery-ajax-goodies/master/jquery-ajax-goodies.js)
 
 # Usage
 ## Concurrency 
